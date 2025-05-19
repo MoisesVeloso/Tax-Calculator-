@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VAT Calculator (Auto + Delete)</title>
+  <title>VAT Calculator (12%)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -11,6 +11,7 @@
       margin: 0;
       padding: 20px;
       background-color: #f4f4f4;
+      color: #333;
     }
 
     .container {
@@ -27,27 +28,6 @@
       margin-bottom: 20px;
     }
 
-    .item-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .item-group input {
-      flex: 1;
-    }
-
-    .item-group button {
-      padding: 10px;
-      background-color: #e53935;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
     label {
       font-weight: bold;
       display: block;
@@ -55,7 +35,7 @@
     }
 
     input[type="number"],
-    button.add-btn {
+    button {
       width: 100%;
       padding: 12px;
       margin-top: 8px;
@@ -65,16 +45,16 @@
       box-sizing: border-box;
     }
 
-    button.add-btn {
-      background-color: #2196F3;
+    button {
+      background-color: #4CAF50;
       color: white;
       border: none;
       margin-top: 15px;
       cursor: pointer;
     }
 
-    button.add-btn:hover {
-      background-color: #1976D2;
+    button:hover {
+      background-color: #45a049;
     }
 
     .results {
@@ -91,17 +71,20 @@
     }
 
     @media (max-width: 480px) {
-      .results p, input, button {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      input, button {
         font-size: 15px;
       }
 
-      .item-group {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .item-group button {
-        width: 100%;
+      .results p {
+        font-size: 16px;
       }
     }
   </style>
@@ -109,90 +92,37 @@
 <body>
 
   <div class="container">
-    <h2>VAT Calculator (Auto)</h2>
+    <h2>VAT Calculator (12%)</h2>
 
-    <div id="itemFields">
-      <label>Item 1 Value (₱):</label>
-      <div class="item-group">
-        <input type="number" class="item-input" placeholder="Enter item value" step="0.01" oninput="calculateVAT()">
-        <button onclick="deleteItem(this)">🗑</button>
-      </div>
-    </div>
+    <label for="amountDue">Total Amount (â±):</label>
+    <input type="number" id="amountDue" placeholder="Enter amount incl. VAT" step="0.01">
 
-    <button class="add-btn" onclick="addItem()">+ Add Item</button>
+    <button onclick="calculateVAT()">Calculate</button>
 
     <div class="results" id="results" style="display: none;">
-      <p><strong>Total Amount:</strong> ₱<span id="totalAmount">0.00</span></p>
-      <p><strong>Net of VAT:</strong> ₱<span id="netOfVAT">0.00</span></p>
-      <p><strong>VAT (12%):</strong> ₱<span id="vatAmount">0.00</span></p>
+      <p><strong>Net of VAT:</strong> â±<span id="netOfVAT"></span></p>
+      <p><strong>VAT (12%):</strong> â±<span id="vatAmount"></span></p>
+      <p><strong>Total Amount:</strong> â±<span id="totalAmount"></span></p>
     </div>
   </div>
 
   <script>
-    let itemCount = 1;
-
-    function addItem() {
-      itemCount++;
-      const container = document.getElementById("itemFields");
-
-      const label = document.createElement("label");
-      label.textContent = `Item ${itemCount} Value (₱):`;
-
-      const group = document.createElement("div");
-      group.className = "item-group";
-
-      const input = document.createElement("input");
-      input.type = "number";
-      input.placeholder = "Enter item value";
-      input.step = "0.01";
-      input.className = "item-input";
-      input.oninput = calculateVAT;
-
-      const button = document.createElement("button");
-      button.textContent = "🗑";
-      button.onclick = function () { deleteItem(button); };
-
-      group.appendChild(input);
-      group.appendChild(button);
-      container.appendChild(label);
-      container.appendChild(group);
-    }
-
-    function deleteItem(button) {
-      const group = button.parentElement;
-      const label = group.previousElementSibling;
-
-      group.remove();
-      if (label && label.tagName.toLowerCase() === "label") {
-        label.remove();
-      }
-
-      calculateVAT(); // Recalculate totals
-    }
-
     function calculateVAT() {
-      const inputs = document.querySelectorAll(".item-input");
-      let total = 0;
+      const amountDueInput = document.getElementById("amountDue").value;
+      const amountDue = parseFloat(amountDueInput);
 
-      inputs.forEach(input => {
-        const val = parseFloat(input.value);
-        if (!isNaN(val)) total += val;
-      });
-
-      if (total > 0) {
-        const netOfVAT = total / 1.12;
-        const vat = netOfVAT * 0.12;
-
-        document.getElementById("totalAmount").textContent = total.toFixed(2);
-        document.getElementById("netOfVAT").textContent = netOfVAT.toFixed(2);
-        document.getElementById("vatAmount").textContent = vat.toFixed(2);
-        document.getElementById("results").style.display = "block";
-      } else {
-        document.getElementById("totalAmount").textContent = "0.00";
-        document.getElementById("netOfVAT").textContent = "0.00";
-        document.getElementById("vatAmount").textContent = "0.00";
-        document.getElementById("results").style.display = "none";
+      if (isNaN(amountDue) || amountDue <= 0) {
+        alert("Please enter a valid amount greater than 0.");
+        return;
       }
+
+      const netOfVAT = amountDue / 1.12;
+      const vat = netOfVAT * 0.12;
+
+      document.getElementById("totalAmount").textContent = amountDue.toFixed(2);
+      document.getElementById("netOfVAT").textContent = netOfVAT.toFixed(2);
+      document.getElementById("vatAmount").textContent = vat.toFixed(2);
+      document.getElementById("results").style.display = "block";
     }
   </script>
 

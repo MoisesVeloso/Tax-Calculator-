@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VAT Calculator (Auto Total)</title>
+  <title>VAT Calculator (Auto + Delete)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -27,6 +27,27 @@
       margin-bottom: 20px;
     }
 
+    .item-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .item-group input {
+      flex: 1;
+    }
+
+    .item-group button {
+      padding: 10px;
+      background-color: #e53935;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
     label {
       font-weight: bold;
       display: block;
@@ -34,7 +55,7 @@
     }
 
     input[type="number"],
-    button {
+    button.add-btn {
       width: 100%;
       padding: 12px;
       margin-top: 8px;
@@ -44,7 +65,7 @@
       box-sizing: border-box;
     }
 
-    button {
+    button.add-btn {
       background-color: #2196F3;
       color: white;
       border: none;
@@ -52,7 +73,7 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button.add-btn:hover {
       background-color: #1976D2;
     }
 
@@ -73,25 +94,37 @@
       .results p, input, button {
         font-size: 15px;
       }
+
+      .item-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .item-group button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>VAT Calculator (Auto Total)</h2>
+    <h2>VAT Calculator (Auto)</h2>
 
     <div id="itemFields">
       <label>Item 1 Value (₱):</label>
-      <input type="number" class="item-input" placeholder="Enter item value" step="0.01" oninput="calculateVAT()">
+      <div class="item-group">
+        <input type="number" class="item-input" placeholder="Enter item value" step="0.01" oninput="calculateVAT()">
+        <button onclick="deleteItem(this)">🗑</button>
+      </div>
     </div>
 
-    <button onclick="addItem()">+ Add Item</button>
+    <button class="add-btn" onclick="addItem()">+ Add Item</button>
 
     <div class="results" id="results" style="display: none;">
+      <p><strong>Total Amount:</strong> ₱<span id="totalAmount">0.00</span></p>
       <p><strong>Net of VAT:</strong> ₱<span id="netOfVAT">0.00</span></p>
       <p><strong>VAT (12%):</strong> ₱<span id="vatAmount">0.00</span></p>
-            <p><strong>Total Amount:</strong> ₱<span id="totalAmount">0.00</span></p>
     </div>
   </div>
 
@@ -105,6 +138,9 @@
       const label = document.createElement("label");
       label.textContent = `Item ${itemCount} Value (₱):`;
 
+      const group = document.createElement("div");
+      group.className = "item-group";
+
       const input = document.createElement("input");
       input.type = "number";
       input.placeholder = "Enter item value";
@@ -112,8 +148,26 @@
       input.className = "item-input";
       input.oninput = calculateVAT;
 
+      const button = document.createElement("button");
+      button.textContent = "🗑";
+      button.onclick = function () { deleteItem(button); };
+
+      group.appendChild(input);
+      group.appendChild(button);
       container.appendChild(label);
-      container.appendChild(input);
+      container.appendChild(group);
+    }
+
+    function deleteItem(button) {
+      const group = button.parentElement;
+      const label = group.previousElementSibling;
+
+      group.remove();
+      if (label && label.tagName.toLowerCase() === "label") {
+        label.remove();
+      }
+
+      calculateVAT(); // Recalculate totals
     }
 
     function calculateVAT() {

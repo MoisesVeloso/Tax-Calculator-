@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VAT Calculator (12%)</title>
+  <title>VAT Calculator (Auto Total)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -11,7 +11,6 @@
       margin: 0;
       padding: 20px;
       background-color: #f4f4f4;
-      color: #333;
     }
 
     .container {
@@ -46,7 +45,7 @@
     }
 
     button {
-      background-color: #4CAF50;
+      background-color: #2196F3;
       color: white;
       border: none;
       margin-top: 15px;
@@ -54,7 +53,7 @@
     }
 
     button:hover {
-      background-color: #45a049;
+      background-color: #1976D2;
     }
 
     .results {
@@ -71,20 +70,8 @@
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .container {
-        padding: 15px;
-      }
-
-      input, button {
+      .results p, input, button {
         font-size: 15px;
-      }
-
-      .results p {
-        font-size: 16px;
       }
     }
   </style>
@@ -92,37 +79,66 @@
 <body>
 
   <div class="container">
-    <h2>VAT Calculator (12%)</h2>
+    <h2>VAT Calculator (Auto Total)</h2>
 
-    <label for="amountDue">Total Amount (₱):</label>
-    <input type="number" id="amountDue" placeholder="Enter amount incl. VAT" step="0.01">
+    <div id="itemFields">
+      <label>Item 1 Value (₱):</label>
+      <input type="number" class="item-input" placeholder="Enter item value" step="0.01" oninput="calculateVAT()">
+    </div>
 
-    <button onclick="calculateVAT()">Calculate</button>
+    <button onclick="addItem()">+ Add Item</button>
 
     <div class="results" id="results" style="display: none;">
-      <p><strong>Net of VAT:</strong> ₱<span id="netOfVAT"></span></p>
-      <p><strong>VAT (12%):</strong> ₱<span id="vatAmount"></span></p>
-      <p><strong>Total Amount:</strong> ₱<span id="totalAmount"></span></p>
+      <p><strong>Total Amount:</strong> ₱<span id="totalAmount">0.00</span></p>
+      <p><strong>Net of VAT:</strong> ₱<span id="netOfVAT">0.00</span></p>
+      <p><strong>VAT (12%):</strong> ₱<span id="vatAmount">0.00</span></p>
     </div>
   </div>
 
   <script>
+    let itemCount = 1;
+
+    function addItem() {
+      itemCount++;
+      const container = document.getElementById("itemFields");
+
+      const label = document.createElement("label");
+      label.textContent = `Item ${itemCount} Value (₱):`;
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.placeholder = "Enter item value";
+      input.step = "0.01";
+      input.className = "item-input";
+      input.oninput = calculateVAT;
+
+      container.appendChild(label);
+      container.appendChild(input);
+    }
+
     function calculateVAT() {
-      const amountDueInput = document.getElementById("amountDue").value;
-      const amountDue = parseFloat(amountDueInput);
+      const inputs = document.querySelectorAll(".item-input");
+      let total = 0;
 
-      if (isNaN(amountDue) || amountDue <= 0) {
-        alert("Please enter a valid amount greater than 0.");
-        return;
+      inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) total += val;
+      });
+
+      if (total > 0) {
+        const netOfVAT = total / 1.12;
+        const vat = netOfVAT * 0.12;
+
+        document.getElementById("totalAmount").textContent = total.toFixed(2);
+        document.getElementById("netOfVAT").textContent = netOfVAT.toFixed(2);
+        document.getElementById("vatAmount").textContent = vat.toFixed(2);
+        document.getElementById("results").style.display = "block";
+      } else {
+        document.getElementById("totalAmount").textContent = "0.00";
+        document.getElementById("netOfVAT").textContent = "0.00";
+        document.getElementById("vatAmount").textContent = "0.00";
+        document.getElementById("results").style.display = "none";
       }
-
-      const netOfVAT = amountDue / 1.12;
-      const vat = netOfVAT * 0.12;
-
-      document.getElementById("totalAmount").textContent = amountDue.toFixed(2);
-      document.getElementById("netOfVAT").textContent = netOfVAT.toFixed(2);
-      document.getElementById("vatAmount").textContent = vat.toFixed(2);
-      document.getElementById("results").style.display = "block";
     }
   </script>
 

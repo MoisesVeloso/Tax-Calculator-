@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VAT Calculator (12%)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input[type="number"],
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      border-radius: 4px;
+    }
+
+    .results p {
+      margin: 8px 0;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>VAT Calculator (12%)</h2>
+
+  <label for="amountDue">Amount Due (₱):</label>
+  <input type="number" id="amountDue" placeholder="Enter total amount (incl. VAT)" step="0.01">
+
+  <button onclick="calculateVAT()">Calculate</button>
+
+  <div class="results" id="results" style="display: none;">
+    <p><strong>Net of VAT:</strong> ₱<span id="netOfVAT"></span></p>
+    <p><strong>VAT (12%):</strong> ₱<span id="vatAmount"></span></p>
+  </div>
+
+  <script>
+    function calculateVAT() {
+      const amountDueInput = document.getElementById("amountDue").value;
+      const amountDue = parseFloat(amountDueInput);
+
+      if (isNaN(amountDue) || amountDue <= 0) {
+        alert("Please enter a valid amount greater than 0.");
+        return;
+      }
+
+      const netOfVAT = amountDue / 1.12;
+      const vat = netOfVAT * 0.12;
+
+      document.getElementById("netOfVAT").textContent = netOfVAT.toFixed(2);
+      document.getElementById("vatAmount").textContent = vat.toFixed(2);
+      document.getElementById("results").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
